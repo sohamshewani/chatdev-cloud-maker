@@ -1,0 +1,36 @@
+name: ChatDev Autonomous Multi-Agent Maker
+
+on:
+  schedule:
+    # Runs automatically every 3 hours for $0.00
+    - cron: '0 */3 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout Controller
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Clone ChatDev Engine
+        run: |
+          git clone https://github.com/OpenBMB/ChatDev.git
+          cd ChatDev
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Multi-Agent Software Company
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # Sets up Gemini's free OpenAI-compatible API endpoint
+          OPENAI_BASE_URL: "https://generativelanguage.googleapis.com/v1beta/openai/"
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        run: python agent_dispatcher.py
